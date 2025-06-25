@@ -1,0 +1,66 @@
+/* primary btn */
+.btn-primary {
+  background-color: #074173 !important; 
+  border-color: #074173 !important;
+}
+
+.btn-primary:hover {
+  background-color: #073258 !important;
+  border-color: #073258 !important;
+}
+
+/* secondary button */
+.btn-secondary {
+  background-color: #1679AB !important; 
+  border-color: #1679AB !important;
+}
+
+.btn-secondary:hover {
+  background-color: #0f5c83 !important; 
+  border-color: #0f5c83 !important;
+}
+
+/* secondary outline btn */
+.btn-outline-secondary{
+  background-color: white;
+  border-color:#0f5c83 ;
+}
+
+.btn-outline-secondary:hover{
+  background-color: #0f5c83;
+  border-color:#0f5c83 ;
+}
+
+/*  primary background*/
+.bg-primary{
+  background-color: #074173 !important; 
+  border-color: #074173 !important;
+}
+
+.btn-primary:hover {
+  background-color: #073258 !important; 
+  border-color: #073258 !important;
+}
+
+/* secondary background */
+.bg-secondary{
+  background-color: #1679AB !important; 
+  border-color: #1679AB !important;
+}
+
+
+/* nav pills */
+.nav-pills .nav-link {
+  color: #555 !important;
+  background-color: rgb(243, 243, 243) !important;
+}
+
+.nav-pills .nav-link.active {
+  color: #fff !important;
+  background-color: #074173 !important;
+}
+
+/* primary text color */
+.text-primary{
+  color: #073258 !important; 
+}
