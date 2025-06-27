@@ -44,35 +44,36 @@ include 'admin_navbar.php';
 <body class="d-flex flex-column min-vh-100">
     <main class="container-lg" style="flex: 1;">
         <h2>Manage Registered Students</h2>
-        <table class="table table-hover table-bordered mb-4">
-            <thead class="table-primary">
-                <tr>
-                    <th>Index Number</th>
-                    <th>Full Name</th>
-                    <th>Birthday</th>
-                    <th>Email</th>
-                    <th>Address</th>
-                    <th>Class</th>
-                    <th>Registered Subjects</th>
-                    <th>Mother's name</th>
-                    <th>Mother's contact</th>
-                    <th>Father's name</th>
-                    <th>Father's contact</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                // Fetch all APPROVED students 
-                $query = "SELECT u.*, GROUP_CONCAT(s.subject_name SEPARATOR ', ') AS subjects
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered mb-4">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Index Number</th>
+                        <th>Full Name</th>
+                        <th>Birthday</th>
+                        <th>Email</th>
+                        <th>Address</th>
+                        <th>Class</th>
+                        <th>Registered Subjects</th>
+                        <th>Mother's name</th>
+                        <th>Mother's contact</th>
+                        <th>Father's name</th>
+                        <th>Father's contact</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    // Fetch all APPROVED students 
+                    $query = "SELECT u.*, GROUP_CONCAT(s.subject_name SEPARATOR ', ') AS subjects
                           FROM users u
                           LEFT JOIN user_subjects us ON u.index_number = us.index_number
                           LEFT JOIN subjects s ON us.subject_id = s.subject_id
                           WHERE u.is_approved = 1
                           GROUP BY u.index_number";
-                $result = $conn->query($query);
-                while ($row = $result->fetch_assoc()) {
-                    echo "<tr>
+                    $result = $conn->query($query);
+                    while ($row = $result->fetch_assoc()) {
+                        echo "<tr>
                             <td>" . htmlspecialchars($row['index_number']) . "</td>
                             <td>" . htmlspecialchars($row['first_name']) . " " . htmlspecialchars($row['last_name']) . "</td>
                             <td>" . htmlspecialchars($row['birthday']) . "</td>
@@ -89,10 +90,11 @@ include 'admin_navbar.php';
                                 
                             </td>
                           </tr>";
-                }
-                ?>
-            </tbody>
-        </table>
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
         <button class="btn btn-outline-secondary mb-5">
             <a href="dashboard.php" class="nav-link">Back to Dashboard</a>
         </button>

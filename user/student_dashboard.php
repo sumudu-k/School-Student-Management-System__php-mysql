@@ -82,14 +82,14 @@ $position = $positions->fetch_assoc();
     <link href="https://fonts.googleapis.com/css2?family=Oleo+Script:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <style>
-.gradient-bg {
-    background: linear-gradient(to bottom right, #d0f0ff, #ffffff);
-}
+    .gradient-bg {
+        background: linear-gradient(to bottom right, #d0f0ff, #ffffff);
+    }
 </style>
 
 <body style="display: flex; flex-direction: column; min-height: 100vh;" class="gradient-bg">
 
-    <main class="container-lg" style="flex: 1;">
+    <main class="container-lg table-responsive " style="flex: 1;">
         <div class="d-flex align-items-center justify-content-between mb-4">
             <h5>Welcome, <b class="me-4"><?= htmlspecialchars($user['full_name']) ?></b> </h5>
             <?php
@@ -118,81 +118,89 @@ $position = $positions->fetch_assoc();
         </ul>
 
         <div class="tab-content">
-            <div class="tab-pane fade show active " id="announcements">
-                <table class="table table-sm table-hover table-bordered mb-5">
-                    <tr class="table-primary">
-                        <th>Subject</th>
-                        <th>Title</th>
-                        <th>Description</th>
-                        <th>Announced At</th>
-                    </tr>
-                    <?php while ($row = $announcements->fetch_assoc()): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($row['subject_name']); ?></td>
-                        <td><?php echo htmlspecialchars($row['title']); ?></td>
-                        <td><?php echo htmlspecialchars($row['description']); ?></td>
-                        <td><?php echo date('M d, Y h:i A', strtotime($row['announced_at'])); ?></td>
-                    </tr>
-                    <?php endwhile; ?>
-                </table>
+            <div class="tab-pane fade show active  " id="announcements">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover table-bordered mb-5">
+                        <tr class="table-primary">
+                            <th>Subject</th>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Announced At</th>
+                        </tr>
+                        <?php while ($row = $announcements->fetch_assoc()): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($row['subject_name']); ?></td>
+                                <td><?php echo htmlspecialchars($row['title']); ?></td>
+                                <td><?php echo htmlspecialchars($row['description']); ?></td>
+                                <td><?php echo date('M d, Y h:i A', strtotime($row['announced_at'])); ?></td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </table>
+                </div>
             </div>
             <div class="tab-pane fade" id="assignments">
-                <table class="table table-sm table-hover table-bordered  mb-5">
-                    <tr class="table-primary">
-                        <th>Subject</th>
-                        <th>Title</th>
-                        <th>Description</th>
-                        <th>Due Date</th>
-                        <th>Marks</th>
-                        <th>Comment</th>
-                    </tr>
-                    <?php while ($row = $assignments->fetch_assoc()): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($row['subject_name']); ?></td>
-                        <td><?php echo htmlspecialchars($row['title']); ?></td>
-                        <td><?php echo htmlspecialchars($row['description']); ?></td>
-                        <td><?php echo htmlspecialchars($row['due_date']); ?></td>
-                        <td><?php echo htmlspecialchars($row['marks']); ?></td>
-                        <td><?php echo htmlspecialchars($row['comment']); ?></td>
-                    </tr>
-                    <?php endwhile; ?>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover table-bordered  mb-5">
+                        <tr class="table-primary">
+                            <th>Subject</th>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Due Date</th>
+                            <th>Marks</th>
+                            <th>Comment</th>
+                        </tr>
+                        <?php while ($row = $assignments->fetch_assoc()): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($row['subject_name']); ?></td>
+                                <td><?php echo htmlspecialchars($row['title']); ?></td>
+                                <td><?php echo htmlspecialchars($row['description']); ?></td>
+                                <td><?php echo htmlspecialchars($row['due_date']); ?></td>
+                                <td><?php echo htmlspecialchars($row['marks']); ?></td>
+                                <td><?php echo htmlspecialchars($row['comment']); ?></td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </table>
+                </div>
             </div>
             <div class="tab-pane fade" id="termexams">
-                <table class="table table-sm table-hover table-bordered mb-5">
-                    <tr class="table-primary">
-                        <th>Date</th>
-                        <th>Subject</th>
-                        <th>Start Time</th>
-                        <th>End Time</th>
-                    </tr>
-                    <?php while ($row = $exams->fetch_assoc()): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($row['exam_date']); ?></td>
-                        <td><?php echo htmlspecialchars($row['subject_name']); ?></td>
-                        <td><?php echo htmlspecialchars($row['start_time']); ?></td>
-                        <td><?php echo htmlspecialchars($row['end_time']); ?></td>
-                    </tr>
-                    <?php endwhile; ?>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover table-bordered mb-5">
+                        <tr class="table-primary">
+                            <th>Date</th>
+                            <th>Subject</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                        </tr>
+                        <?php while ($row = $exams->fetch_assoc()): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($row['exam_date']); ?></td>
+                                <td><?php echo htmlspecialchars($row['subject_name']); ?></td>
+                                <td><?php echo htmlspecialchars($row['start_time']); ?></td>
+                                <td><?php echo htmlspecialchars($row['end_time']); ?></td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </table>
+                </div>
             </div>
             <div class="tab-pane fade" id="examresults">
-                <table class="table table-sm table-hover table-bordered mb-5">
-                    <tr class="table-primary">
-                        <th>Subject</th>
-                        <th>Term</th>
-                        <th>Marks</th>
-                        <th>Comment</th>
-                    </tr>
-                    <?php while ($row = $results->fetch_assoc()): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($row['subject_name']); ?></td>
-                        <td><?php echo htmlspecialchars($row['term_name']); ?></td>
-                        <td><?php echo htmlspecialchars($row['marks']); ?></td>
-                        <td><?php echo htmlspecialchars($row['comment']); ?></td>
-                    </tr>
-                    <?php endwhile; ?>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover table-bordered mb-5">
+                        <tr class="table-primary">
+                            <th>Subject</th>
+                            <th>Term</th>
+                            <th>Marks</th>
+                            <th>Comment</th>
+                        </tr>
+                        <?php while ($row = $results->fetch_assoc()): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($row['subject_name']); ?></td>
+                                <td><?php echo htmlspecialchars($row['term_name']); ?></td>
+                                <td><?php echo htmlspecialchars($row['marks']); ?></td>
+                                <td><?php echo htmlspecialchars($row['comment']); ?></td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </table>
+                </div>
             </div>
             </ul>
         </div>
@@ -203,8 +211,8 @@ $position = $positions->fetch_assoc();
     ?>
     <script src="../styles/js/bootstrap.bundle.min.js"></script>
     <script>
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
     </script>
 </body>
 
