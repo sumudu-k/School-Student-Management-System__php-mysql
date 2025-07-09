@@ -82,6 +82,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 
 <body class="d-flex flex-column min-vh-100">
+    <?php
+    if ($_ENV['ALLOW_REGISTER'] === 'false') : ?>
+    <div class="alert alert-danger text-center mt-3 mx-1 mx-md-3" role="alert"> You cannot create new accounts in Live
+        hosted
+        website. Please setup your own local environment to access full features. Visit
+        [https://github.com/sumudu-k/School-Student-Management-System__php-mysql.git] for more details.
+    </div>
+    <?php endif;
+    ?>
     <main class="container-lg" style="flex: 1;">
         <div class="row justify-content-center mt-4 mb-5">
             <div class="col-md-6">
@@ -190,11 +199,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 </div>
                             </div>
 
+                            <?php
+                            if ($_ENV['ALLOW_REGISTER'] === 'false') : ?>
+                            <div class="d-grid gap-2">
+                                <button type="reset" disabled class="btn btn-primary">
+                                    <i class="fas fa-user-plus "></i> Register
+                                </button>
+                            </div>
+                            <?php else : ?>
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-user-plus"></i> Register
                                 </button>
                             </div>
+                            <?php endif; ?>
                         </form>
                     </div>
                     <div class="card-footer  text-center">
