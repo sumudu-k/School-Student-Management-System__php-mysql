@@ -16,6 +16,12 @@ $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 
+// get user role
+if ($user['role'] === 'demo') {
+    $demo = true;
+} else {
+    $demo = false;
+}
 
 // Fetch ALL exams for ALL subjects 
 $query = "SELECT e.exam_date, s.subject_name, e.start_time, e.end_time 
@@ -82,15 +88,24 @@ $position = $positions->fetch_assoc();
     <link href="https://fonts.googleapis.com/css2?family=Oleo+Script:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <style>
-    .gradient-bg {
-        background: linear-gradient(to bottom right, #d0f0ff, #ffffff);
-    }
+.gradient-bg {
+    background: linear-gradient(to bottom right, #d0f0ff, #ffffff);
+}
 </style>
 
 <body style="display: flex; flex-direction: column; min-height: 100vh;" class="gradient-bg">
-
+    <?php if ($demo === true): ?>
+    <div class="alert alert-danger mt-3 text-center">
+        You are using Demo account in Live hosted website.
+        Please
+        setup your own local environment to access full features. Visit
+        [https://github.com/sumudu-k/School-Student-Management-System__php-mysql.git] for more
+        details."
+    </div>
+    <?php endif; ?>
     <main class="container-lg table-responsive " style="flex: 1;">
         <div class="d-flex align-items-center justify-content-between mb-4">
+
             <h5>Welcome, <b class="me-4"><?= htmlspecialchars($user['full_name']) ?></b> </h5>
             <?php
             if ($position) {
@@ -128,12 +143,12 @@ $position = $positions->fetch_assoc();
                             <th>Announced At</th>
                         </tr>
                         <?php while ($row = $announcements->fetch_assoc()): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($row['subject_name']); ?></td>
-                                <td><?php echo htmlspecialchars($row['title']); ?></td>
-                                <td><?php echo htmlspecialchars($row['description']); ?></td>
-                                <td><?php echo date('M d, Y h:i A', strtotime($row['announced_at'])); ?></td>
-                            </tr>
+                        <tr>
+                            <td><?php echo htmlspecialchars($row['subject_name']); ?></td>
+                            <td><?php echo htmlspecialchars($row['title']); ?></td>
+                            <td><?php echo htmlspecialchars($row['description']); ?></td>
+                            <td><?php echo date('M d, Y h:i A', strtotime($row['announced_at'])); ?></td>
+                        </tr>
                         <?php endwhile; ?>
                     </table>
                 </div>
@@ -150,14 +165,14 @@ $position = $positions->fetch_assoc();
                             <th>Comment</th>
                         </tr>
                         <?php while ($row = $assignments->fetch_assoc()): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($row['subject_name']); ?></td>
-                                <td><?php echo htmlspecialchars($row['title']); ?></td>
-                                <td><?php echo htmlspecialchars($row['description']); ?></td>
-                                <td><?php echo htmlspecialchars($row['due_date']); ?></td>
-                                <td><?php echo htmlspecialchars($row['marks']); ?></td>
-                                <td><?php echo htmlspecialchars($row['comment']); ?></td>
-                            </tr>
+                        <tr>
+                            <td><?php echo htmlspecialchars($row['subject_name']); ?></td>
+                            <td><?php echo htmlspecialchars($row['title']); ?></td>
+                            <td><?php echo htmlspecialchars($row['description']); ?></td>
+                            <td><?php echo htmlspecialchars($row['due_date']); ?></td>
+                            <td><?php echo htmlspecialchars($row['marks']); ?></td>
+                            <td><?php echo htmlspecialchars($row['comment']); ?></td>
+                        </tr>
                         <?php endwhile; ?>
                     </table>
                 </div>
@@ -172,12 +187,12 @@ $position = $positions->fetch_assoc();
                             <th>End Time</th>
                         </tr>
                         <?php while ($row = $exams->fetch_assoc()): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($row['exam_date']); ?></td>
-                                <td><?php echo htmlspecialchars($row['subject_name']); ?></td>
-                                <td><?php echo htmlspecialchars($row['start_time']); ?></td>
-                                <td><?php echo htmlspecialchars($row['end_time']); ?></td>
-                            </tr>
+                        <tr>
+                            <td><?php echo htmlspecialchars($row['exam_date']); ?></td>
+                            <td><?php echo htmlspecialchars($row['subject_name']); ?></td>
+                            <td><?php echo htmlspecialchars($row['start_time']); ?></td>
+                            <td><?php echo htmlspecialchars($row['end_time']); ?></td>
+                        </tr>
                         <?php endwhile; ?>
                     </table>
                 </div>
@@ -192,12 +207,12 @@ $position = $positions->fetch_assoc();
                             <th>Comment</th>
                         </tr>
                         <?php while ($row = $results->fetch_assoc()): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($row['subject_name']); ?></td>
-                                <td><?php echo htmlspecialchars($row['term_name']); ?></td>
-                                <td><?php echo htmlspecialchars($row['marks']); ?></td>
-                                <td><?php echo htmlspecialchars($row['comment']); ?></td>
-                            </tr>
+                        <tr>
+                            <td><?php echo htmlspecialchars($row['subject_name']); ?></td>
+                            <td><?php echo htmlspecialchars($row['term_name']); ?></td>
+                            <td><?php echo htmlspecialchars($row['marks']); ?></td>
+                            <td><?php echo htmlspecialchars($row['comment']); ?></td>
+                        </tr>
                         <?php endwhile; ?>
                     </table>
                 </div>
@@ -211,8 +226,8 @@ $position = $positions->fetch_assoc();
     ?>
     <script src="../styles/js/bootstrap.bundle.min.js"></script>
     <script>
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
     </script>
 </body>
 

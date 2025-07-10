@@ -3,6 +3,11 @@ session_start();
 include '../db.php';
 include '../functions.php';
 
+if (isset($_ENV['ALLOW_REGISTER']) && $_ENV['ALLOW_REGISTER'] === 'false') {
+    echo 'Registration is currently disabled on live hosted website.';
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $index_number = $_POST['index_number'];
     $full_name = $_POST['full_name'];

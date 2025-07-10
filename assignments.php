@@ -155,7 +155,7 @@ include 'admin_navbar.php';
                     <td class='d-flex'>
                         <a href='?edit=" . $row['assignment_id'] . "'><button class='btn btn-sm btn-secondary me-1 me-sm-2'>Edit</button></a> 
                         
-                        <button class='btn btn-sm btn-danger' onclick=\"" . $deleteConfirmFunction . "('" . $row['assignment_id'] . "', '" . htmlspecialchars($row['title'], ENT_QUOTES) . "')\">Reject</button>
+                        <button class='btn btn-sm btn-danger' onclick=\"" . $deleteConfirmFunction . "('" . $row['assignment_id'] . "', '" . htmlspecialchars($row['title'], ENT_QUOTES) . "')\">Delete</button>
                                 
                     </td>
                   </tr>";
