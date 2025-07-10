@@ -1,7 +1,9 @@
 <?php
 session_start();
+ob_start();
 include 'db.php';
 include 'functions.php';
+
 $deleteConfirmFunction = createDeleteModal('profile change request');
 
 if (!isset($_SESSION['teacherID'])) {
@@ -9,38 +11,60 @@ if (!isset($_SESSION['teacherID'])) {
     exit;
 }
 
-$is_super_admin = ($_SESSION['position'] === 'classroom_teacher');
+$teacherID = $_SESSION['teacherID'];
+
+$query = "SELECT position, role FROM teachers WHERE teacherID = ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("s", $teacherID);
+$stmt->execute();
+$result = $stmt->get_result();
+$teacher_data = $result->fetch_assoc();
+
+$is_super_admin = ($teacher_data['position'] === 'classroom_teacher');
+$is_demo_account = ($teacher_data['role'] === 'demo');
+
 if (!$is_super_admin) {
     showToast('You do not have permission to access this page.', 'error');
     header("Location: login.php");
     exit;
 }
 
-// Approve Update
 if (isset($_GET['approve'])) {
-    $update_id = $_GET['approve'];
+    if ($is_demo_account) {
+        showToast('Action not allowed: You are using a demo account and cannot approve profile updates.', 'danger');
+        header("Location: admin_profile_updates.php");
+        exit();
+    }
 
-    // Fetch the update details before deleting it
-    $query = "SELECT * FROM profile_updates WHERE update_id = ?";
+    $update_id = filter_input(INPUT_GET, 'approve', FILTER_VALIDATE_INT);
+
+    if (!$update_id) {
+        showToast('Invalid update ID provided for approval.', 'danger');
+        header("Location: admin_profile_updates.php");
+        exit();
+    }
+
+    $query = "SELECT * FROM profile_updates WHERE update_id = ? AND status = 'pending'";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("i", $update_id);
     $stmt->execute();
     $result = $stmt->get_result();
     $update_data = $result->fetch_assoc();
 
-    if (!$result->num_rows == 0) {
-
-        showToast('No update found with the provided ID.', 'error');
+    if (!$update_data) {
+        showToast('No pending update found with the provided ID.', 'warning');
+        header("Location: admin_profile_updates.php");
+        exit();
     }
 
-    if ($update_data) {
-        // Apply the changes to the users table
-        $query = "UPDATE users 
-                  SET first_name = ?, last_name = ?, full_name = ?, email = ?, class = ?, birthday = ?, address = ?, 
-                      mother_name = ?, mother_contact = ?, father_name = ?, father_contact = ?
-                  WHERE index_number = ?";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param(
+    $conn->begin_transaction();
+    try {
+        $update_user_query = "UPDATE users 
+                              SET first_name = ?, last_name = ?, full_name = ?, email = ?, class = ?, birthday = ?, address = ?, 
+                                  mother_name = ?, mother_contact = ?, father_name = ?, father_contact = ?
+                              WHERE index_number = ?";
+        $update_user_stmt = $conn->prepare($update_user_query);
+        $update_user_stmt->bind_param(
             "ssssssssssss",
             $update_data['first_name'],
             $update_data['last_name'],
@@ -55,28 +79,63 @@ if (isset($_GET['approve'])) {
             $update_data['father_contact'],
             $update_data['index_number']
         );
-        $stmt->execute();
+        $update_user_stmt->execute();
 
-        // Delete the update from the profile_updates table
-        $query = "DELETE FROM profile_updates WHERE update_id = ?";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("i", $update_id);
-        $stmt->execute();
+        $delete_update_query = "DELETE FROM profile_updates WHERE update_id = ?";
+        $delete_update_stmt = $conn->prepare($delete_update_query);
+        $delete_update_stmt->bind_param("i", $update_id);
+        $delete_update_stmt->execute();
 
+        $conn->commit();
         showToast('Profile update approved successfully.', 'success');
+    } catch (mysqli_sql_exception $e) {
+        $conn->rollback();
+        showToast('Failed to approve profile update: ' . $e->getMessage(), 'danger');
     }
+
+    header("Location: admin_profile_updates.php");
+    exit();
 }
 
-// Reject Update
 if (isset($_GET['delete'])) {
-    $update_id = $_GET['delete'];
+    if ($is_demo_account) {
+        showToast('Action not allowed: You are using a demo account and cannot reject profile updates.', 'danger');
+        header("Location: admin_profile_updates.php");
+        exit();
+    }
+
+    $update_id = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_INT);
+
+    if (!$update_id) {
+        showToast('Invalid update ID provided for rejection.', 'danger');
+        header("Location: admin_profile_updates.php");
+        exit();
+    }
+
+    $check_query = "SELECT COUNT(*) FROM profile_updates WHERE update_id = ? AND status = 'pending'";
+    $check_stmt = $conn->prepare($check_query);
+    $check_stmt->bind_param("i", $update_id);
+    $check_stmt->execute();
+    $exists = $check_stmt->get_result()->fetch_row()[0];
+
+    if ($exists == 0) {
+        showToast('No pending update found with the provided ID to reject.', 'warning');
+        header("Location: admin_profile_updates.php");
+        exit();
+    }
 
     $query = "DELETE FROM profile_updates WHERE update_id = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("i", $update_id);
-    $stmt->execute();
-    showToast('Profile update rejected.', 'danger');
+    if ($stmt->execute()) {
+        showToast('Profile update rejected.', 'danger');
+    } else {
+        showToast('Failed to reject profile update.', 'danger');
+    }
+    header("Location: admin_profile_updates.php");
+    exit();
 }
+ob_end_flush();
 ?>
 <!DOCTYPE html>
 <html>
@@ -96,6 +155,13 @@ include 'admin_navbar.php';
 
 <body class="d-flex flex-column min-vh-100">
     <main class="container-lg" style="flex: 1;">
+
+        <?php if ($is_demo_account): ?>
+            <div class="alert alert-danger mt-3 text-center">
+                You are using a **Demo account** on a live hosted website. You **cannot approve or reject profile update
+                requests**.
+            </div>
+        <?php endif; ?>
 
         <h2 class="text-primary mb-4">Review Profile Updates</h2>
         <div class="table-responsive mb-5">
@@ -121,60 +187,57 @@ include 'admin_navbar.php';
                 <tbody>
                     <?php
                     $query = "SELECT 
-                      pu.update_id, 
-                      pu.index_number, 
-                      pu.first_name, 
-                      pu.last_name, 
-                      pu.full_name,
-                      pu.email, 
-                      pu.class, 
-                      pu.birthday, 
-                      pu.address, 
-                      pu.mother_name, 
-                      pu.mother_contact, 
-                      pu.father_name, 
-                      pu.father_contact, 
-                      pu.status,
-                      u.first_name AS u_first_name, 
-                      u.last_name AS u_last_name, 
-                      u.full_name AS u_full_name,
-                      u.email AS u_email, 
-                      u.class AS u_class, 
-                      u.birthday AS u_birthday, 
-                      u.address AS u_address, 
-                      u.mother_name AS u_mother_name, 
-                      u.mother_contact AS u_mother_contact, 
-                      u.father_name AS u_father_name, 
-                      u.father_contact AS u_father_contact
-                  FROM profile_updates pu
-                  LEFT JOIN users u ON pu.index_number = u.index_number";
+                                pu.update_id, 
+                                pu.index_number, 
+                                pu.first_name, 
+                                pu.last_name, 
+                                pu.full_name,
+                                pu.email, 
+                                pu.class, 
+                                pu.birthday, 
+                                pu.address, 
+                                pu.mother_name, 
+                                pu.mother_contact, 
+                                pu.father_name, 
+                                pu.father_contact, 
+                                pu.status
+                              FROM profile_updates pu
+                              WHERE pu.status = 'pending'
+                              ORDER BY pu.update_id DESC";
                     $result = $conn->query($query);
 
+                    if ($result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                            echo "<tr>
+                                <td>" . htmlspecialchars($row['index_number']) . "</td>
+                                <td>" . htmlspecialchars($row['first_name']) . "</td>
+                                <td>" . htmlspecialchars($row['last_name']) . "</td>
+                                <td>" . htmlspecialchars($row['full_name']) . "</td>
+                                <td>" . htmlspecialchars($row['email']) . "</td>
+                                <td>" . htmlspecialchars($row['class']) . "</td>
+                                <td>" . htmlspecialchars($row['birthday']) . "</td>
+                                <td>" . htmlspecialchars($row['address']) . "</td>
+                                <td>" . htmlspecialchars($row['mother_name']) . "</td>
+                                <td>" . htmlspecialchars($row['mother_contact']) . "</td>
+                                <td>" . htmlspecialchars($row['father_name']) . "</td>
+                                <td>" . htmlspecialchars($row['father_contact']) . "</td>
+                                <td>" . htmlspecialchars($row['status']) . "</td>
+                                <td>
+                                <div class='d-flex'>";
 
-                    while ($row = $result->fetch_assoc()) {
-
-                        echo "<tr>
-                    <td>" . htmlspecialchars($row['index_number']) . "</td>
-                    <td>" . htmlspecialchars($row['first_name']) . "</td>
-                    <td>" . htmlspecialchars($row['last_name']) . "</td>
-                    <td>" . htmlspecialchars($row['full_name']) . "</td>
-                    <td>" . htmlspecialchars($row['email']) . "</td>
-                    <td>" . htmlspecialchars($row['class']) . "</td>
-                    <td>" . htmlspecialchars($row['birthday']) . "</td>
-                    <td>" . htmlspecialchars($row['address']) . "</td>
-                    <td>" . htmlspecialchars($row['mother_name']) . "</td>
-                    <td>" . htmlspecialchars($row['mother_contact']) . "</td>
-                    <td>" . htmlspecialchars($row['father_name']) . "</td>
-                    <td>" . htmlspecialchars($row['father_contact']) . "</td>
-                    <td>" . htmlspecialchars($row['status']) . "</td>
-                    <td>
-                    <div class='d-flex'>
-                    <a class='btn btn-secondary btn-sm me-2' href='?approve=" . $row['update_id'] . "'>Approve</a>
-
-                   <button class='btn btn-sm btn-danger' onclick=\"" . $deleteConfirmFunction . "('" . $row['update_id'] . "', '" . htmlspecialchars($row['first_name'] . ' ' . $row['last_name'], ENT_QUOTES) . "')\">Reject</button>
-                                </div>
-                    </td>
-                  </tr>";
+                            if ($is_demo_account) {
+                                echo "<button class='btn btn-secondary btn-sm me-2' disabled>Approve</button>";
+                                echo "<button class='btn btn-sm btn-danger' disabled>Reject</button>";
+                            } else {
+                                echo "<a class='btn btn-secondary btn-sm me-2' href='?approve=" . htmlspecialchars($row['update_id']) . "'>Approve</a>";
+                                echo "<button class='btn btn-sm btn-danger' onclick=\"" . $deleteConfirmFunction . "('" . htmlspecialchars($row['update_id']) . "', '" . htmlspecialchars($row['full_name'], ENT_QUOTES) . "')\">Reject</button>";
+                            }
+                            echo "</div>
+                                </td>
+                            </tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='14' class='text-center'>No pending profile update requests.</td></tr>";
                     }
                     ?>
                 </tbody>

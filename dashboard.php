@@ -1,50 +1,72 @@
 <?php
 session_start();
+
 if (!isset($_SESSION['teacherID'])) {
     header("Location: login.php");
     exit;
 }
+
 include 'db.php';
 
-// Fetch the teacher's details 
 $teacherID = $_SESSION['teacherID'];
 $query = "SELECT * FROM teachers WHERE teacherID = ?";
 $stmt = $conn->prepare($query);
+
+if (!$stmt) {
+    error_log("Failed to prepare teacher query: " . $conn->error);
+    header("Location: login.php");
+    exit;
+}
+
 $stmt->bind_param("s", $teacherID);
 $stmt->execute();
 $result = $stmt->get_result();
 $teacher = $result->fetch_assoc();
 
-// Fetch the subject name and count of registered students using the teaching_subject ID
-if ($teacher && isset($teacher['teaching_subject'])) {
+if (!$teacher) {
+    // Teacher not found, likely an invalid session ID
+    session_destroy();
+    header("Location: login.php");
+    exit;
+}
+
+$demo = ($teacher['role'] === 'demo');
+
+$subject_name = 'Unknown Subject';
+$student_count = 0;
+
+if (isset($teacher['teaching_subject']) && !empty($teacher['teaching_subject'])) {
     $subject_id = $teacher['teaching_subject'];
 
-    // Fetch subject name
     $query = "SELECT subject_name FROM subjects WHERE subject_id = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $subject_id);
-    $stmt->execute();
-    $subject_result = $stmt->get_result();
-    $subject = $subject_result->fetch_assoc();
-    $subject_name = $subject ? $subject['subject_name'] : 'Unknown Subject';
+    if ($stmt) {
+        $stmt->bind_param("i", $subject_id);
+        $stmt->execute();
+        $subject_result = $stmt->get_result();
+        $subject = $subject_result->fetch_assoc();
+        $subject_name = $subject ? htmlspecialchars($subject['subject_name']) : 'Unknown Subject';
+    } else {
+        error_log("Failed to prepare subject name query: " . $conn->error);
+    }
 
-    // Count the number of students registered for the subject
     $query = "SELECT COUNT(*) AS student_count FROM user_subjects 
               JOIN users ON user_subjects.index_number = users.index_number 
               WHERE subject_id = ? AND users.is_approved = TRUE";
 
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $subject_id);
-    $stmt->execute();
-    $student_count_result = $stmt->get_result();
-    $student_count_row = $student_count_result->fetch_assoc();
-    $student_count = $student_count_row['student_count'];
-} else {
-    $subject_name = 'Unknown Subject';
-    $student_count = 0;
+    if ($stmt) {
+        $stmt->bind_param("i", $subject_id);
+        $stmt->execute();
+        $student_count_result = $stmt->get_result();
+        $student_count_row = $student_count_result->fetch_assoc();
+        $student_count = $student_count_row['student_count'];
+    } else {
+        error_log("Failed to prepare student count query: " . $conn->error);
+    }
 }
 
-$is_super_admin = ($_SESSION['position'] === 'classroom_teacher');
+$is_super_admin = (isset($_SESSION['position']) && $_SESSION['position'] === 'classroom_teacher');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -60,53 +82,53 @@ $is_super_admin = ($_SESSION['position'] === 'classroom_teacher');
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Oleo+Script:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        .card-1 {
-            background: linear-gradient(45deg, #4e73df, #6f8df7);
-        }
+    .card-1 {
+        background: linear-gradient(45deg, #4e73df, #6f8df7);
+    }
 
-        .card-2 {
-            background: linear-gradient(45deg, #1cc88a, #47d7ac);
-        }
+    .card-2 {
+        background: linear-gradient(45deg, #1cc88a, #47d7ac);
+    }
 
-        .card-3 {
-            background: linear-gradient(45deg, #36b9cc, #4dd6e7);
-        }
+    .card-3 {
+        background: linear-gradient(45deg, #36b9cc, #4dd6e7);
+    }
 
-        .card-4 {
-            background: linear-gradient(45deg, #f6c23e, #fbd283);
-        }
+    .card-4 {
+        background: linear-gradient(45deg, #f6c23e, #fbd283);
+    }
 
-        .card-7 {
-            background: linear-gradient(45deg, #6b5b95, #9083bc);
-        }
+    .card-7 {
+        background: linear-gradient(45deg, #6b5b95, #9083bc);
+    }
 
-        .card-8 {
-            background: linear-gradient(45deg, #45b7af, #7fd5cf);
-        }
+    .card-8 {
+        background: linear-gradient(45deg, #45b7af, #7fd5cf);
+    }
 
-        .card-9 {
-            background: linear-gradient(45deg, #cf556c, #e78c9c);
-        }
+    .card-9 {
+        background: linear-gradient(45deg, #cf556c, #e78c9c);
+    }
 
-        .card-10 {
-            background: linear-gradient(45deg, #e77e23, #f1a667);
-        }
+    .card-10 {
+        background: linear-gradient(45deg, #e77e23, #f1a667);
+    }
 
-        .card-11 {
-            background: linear-gradient(45deg, #786fa6, #9f97c1);
-        }
+    .card-11 {
+        background: linear-gradient(45deg, #786fa6, #9f97c1);
+    }
 
-        .card-12 {
-            background: linear-gradient(45deg, #2e86de, #70aae8);
-        }
+    .card-12 {
+        background: linear-gradient(45deg, #2e86de, #70aae8);
+    }
 
-        .dashboard-card {
-            transition: transform 0.3s;
-        }
+    .dashboard-card {
+        transition: transform 0.3s;
+    }
 
-        .dashboard-card:hover {
-            transform: translateY(-5px);
-        }
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+    }
     </style>
 </head>
 
@@ -117,50 +139,58 @@ $is_super_admin = ($_SESSION['position'] === 'classroom_teacher');
 
     <main class="container-lg" style="flex: 1;">
         <div class="container mt-4">
-            <h4 class="text-dark fw-bold mb-3">Welcome, <?= $teacher['full_name'] ?></h4>
+            <?php if ($demo === true): ?>
+            <div class="alert alert-danger mt-3 text-center">
+                You are using a **Demo account** on a live hosted website. Please set up your own local environment to
+                access full features. Visit <a
+                    href="https://github.com/sumudu-k/School-Student-Management-System__php-mysql.git"
+                    target="_blank">GitHub</a> for more details.
+            </div>
+            <?php endif; ?>
+            <h4 class="text-dark fw-bold mb-3">Welcome, <?= htmlspecialchars($teacher['full_name']) ?></h4>
             <?php if ($teacher): ?>
-                <div class="row mb-4">
-                    <div class="col-md-6 pb-1">
-                        <div class="bg-white shadow-sm rounded">
-                            <div class="d-flex align-items-center ps-3">
-                                <span class="badge rounded-circle bg-dark p-2 me-2">
-                                    <i class="fas fa-envelope fa-sm"></i>
-                                </span>
-                                <div>
-                                    <h6 class="mb-0 small text-muted">Email</h6>
-                                    <p class="mb-0 fw-bold"><?php echo htmlspecialchars($teacher['email']); ?></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3 pb-1">
-                        <div class="bg-white shadow-sm rounded">
-                            <div class="d-flex align-items-center ps-3">
-                                <span class="badge rounded-circle bg-warning p-2 me-2">
-                                    <i class="fas fa-book fa-sm"></i>
-                                </span>
-                                <div>
-                                    <h6 class="mb-0 small text-muted">Subject</h6>
-                                    <p class="mb-0 fw-bold"><?php echo htmlspecialchars($subject_name); ?></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 pb-1">
-                        <div class="bg-white shadow-sm rounded">
-                            <div class="d-flex align-items-center ps-3">
-                                <span class="badge rounded-circle bg-danger p-2 me-2">
-                                    <i class="fas fa-users fa-sm"></i>
-                                </span>
-                                <div>
-                                    <h6 class="mb-0 small text-muted">Students Registered</h6>
-                                    <p class="mb-0 fw-bold"><?php echo $student_count; ?></p>
-                                </div>
+            <div class="row mb-4">
+                <div class="col-md-6 pb-1">
+                    <div class="bg-white shadow-sm rounded">
+                        <div class="d-flex align-items-center ps-3">
+                            <span class="badge rounded-circle bg-dark p-2 me-2">
+                                <i class="fas fa-envelope fa-sm"></i>
+                            </span>
+                            <div>
+                                <h6 class="mb-0 small text-muted">Email</h6>
+                                <p class="mb-0 fw-bold"><?php echo htmlspecialchars($teacher['email']); ?></p>
                             </div>
                         </div>
                     </div>
                 </div>
+                <div class="col-md-6 col-lg-3 pb-1">
+                    <div class="bg-white shadow-sm rounded">
+                        <div class="d-flex align-items-center ps-3">
+                            <span class="badge rounded-circle bg-warning p-2 me-2">
+                                <i class="fas fa-book fa-sm"></i>
+                            </span>
+                            <div>
+                                <h6 class="mb-0 small text-muted">Subject</h6>
+                                <p class="mb-0 fw-bold"><?php echo $subject_name; ?></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-3 pb-1">
+                    <div class="bg-white shadow-sm rounded">
+                        <div class="d-flex align-items-center ps-3">
+                            <span class="badge rounded-circle bg-danger p-2 me-2">
+                                <i class="fas fa-users fa-sm"></i>
+                            </span>
+                            <div>
+                                <h6 class="mb-0 small text-muted">Students Registered</h6>
+                                <p class="mb-0 fw-bold"><?php echo $student_count; ?></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <?php endif; ?>
 
             <h4 class="pb-2 mb-4 border-bottom text-secondary fw-bold">Management Menu</h4>
@@ -199,75 +229,75 @@ $is_super_admin = ($_SESSION['position'] === 'classroom_teacher');
                 </div>
 
                 <?php if ($is_super_admin): ?>
-                    <div class="col-12 mt-4">
-                        <h4 class="pb-2 mb-4 border-bottom text-secondary fw-bold mt-5">Super Admin Functions</h4>
-                    </div>
+                <div class="col-12 mt-4">
+                    <h4 class="pb-2 mb-4 border-bottom text-secondary fw-bold mt-5">Super Admin Functions</h4>
+                </div>
 
-                    <div class="col-4 col-md-3 col-xl-2">
-                        <div class="card h-100 dashboard-card card-7">
-                            <a href="subjects.php" class="card-body text-center text-white text-decoration-none">
-                                <i class="fas fa-book-open fs-1 d-block mb-3"></i>
-                                <h6>Manage Subjects</h6>
-                            </a>
-                        </div>
+                <div class="col-4 col-md-3 col-xl-2">
+                    <div class="card h-100 dashboard-card card-7">
+                        <a href="subjects.php" class="card-body text-center text-white text-decoration-none">
+                            <i class="fas fa-book-open fs-1 d-block mb-3"></i>
+                            <h6>Manage Subjects</h6>
+                        </a>
                     </div>
-                    <div class="col-4 col-md-3 col-xl-2">
-                        <div class="card h-100 dashboard-card card-8">
-                            <a href="timetable.php" class="card-body text-center text-white text-decoration-none">
-                                <i class="fas fa-calendar-alt fs-1 d-block mb-3"></i>
-                                <h6>Manage Exam Timetables</h6>
-                            </a>
-                        </div>
+                </div>
+                <div class="col-4 col-md-3 col-xl-2">
+                    <div class="card h-100 dashboard-card card-8">
+                        <a href="timetable.php" class="card-body text-center text-white text-decoration-none">
+                            <i class="fas fa-calendar-alt fs-1 d-block mb-3"></i>
+                            <h6>Manage Exam Timetables</h6>
+                        </a>
                     </div>
-                    <div class="col-4 col-md-3 col-xl-2">
-                        <div class="card h-100 dashboard-card card-9">
-                            <a href="positions.php" class="card-body text-center text-white text-decoration-none">
-                                <i class="fas fa-user-tag fs-1 d-block mb-3"></i>
-                                <h6>Assign Student Positions</h6>
-                            </a>
-                        </div>
+                </div>
+                <div class="col-4 col-md-3 col-xl-2">
+                    <div class="card h-100 dashboard-card card-9">
+                        <a href="positions.php" class="card-body text-center text-white text-decoration-none">
+                            <i class="fas fa-user-tag fs-1 d-block mb-3"></i>
+                            <h6>Assign Student Positions</h6>
+                        </a>
                     </div>
-                    <div class="col-4 col-md-3 col-xl-2">
-                        <div class="card h-100 dashboard-card card-10">
-                            <a href="requests.php" class="card-body text-center text-white text-decoration-none">
-                                <i class="fas fa-user-check fs-1 d-block mb-3"></i>
-                                <h6>Review Teacher Registration</h6>
-                            </a>
-                        </div>
+                </div>
+                <div class="col-4 col-md-3 col-xl-2">
+                    <div class="card h-100 dashboard-card card-10">
+                        <a href="requests.php" class="card-body text-center text-white text-decoration-none">
+                            <i class="fas fa-user-check fs-1 d-block mb-3"></i>
+                            <h6>Review Teacher Registration</h6>
+                        </a>
                     </div>
-                    <div class="col-4 col-md-3 col-xl-2">
-                        <div class="card h-100 dashboard-card card-11">
-                            <a href="review_users.php" class="card-body text-center text-white text-decoration-none">
-                                <i class="fas fa-user-graduate fs-1 d-block mb-3"></i>
-                                <h6>Review Student Registration</h6>
-                            </a>
-                        </div>
+                </div>
+                <div class="col-4 col-md-3 col-xl-2">
+                    <div class="card h-100 dashboard-card card-11">
+                        <a href="review_users.php" class="card-body text-center text-white text-decoration-none">
+                            <i class="fas fa-user-graduate fs-1 d-block mb-3"></i>
+                            <h6>Review Student Registration</h6>
+                        </a>
                     </div>
-                    <div class="col-4 col-md-3 col-xl-2">
-                        <div class="card h-100 dashboard-card card-12">
-                            <a href="view_users.php" class="card-body text-center text-white text-decoration-none">
-                                <i class="fas fa-users fs-1 d-block mb-3"></i>
-                                <h6>View Students</h6>
-                            </a>
-                        </div>
+                </div>
+                <div class="col-4 col-md-3 col-xl-2">
+                    <div class="card h-100 dashboard-card card-12">
+                        <a href="view_users.php" class="card-body text-center text-white text-decoration-none">
+                            <i class="fas fa-users fs-1 d-block mb-3"></i>
+                            <h6>View Students</h6>
+                        </a>
                     </div>
-                    <div class="col-4 col-md-3 col-xl-2">
-                        <div class="card h-100 dashboard-card card-1">
-                            <a href="view_teachers.php" class="card-body text-center text-white text-decoration-none">
-                                <i class="fas fa-chalkboard-teacher fs-1 d-block mb-3"></i>
-                                <h6>View Teachers</h6>
-                            </a>
-                        </div>
+                </div>
+                <div class="col-4 col-md-3 col-xl-2">
+                    <div class="card h-100 dashboard-card card-1">
+                        <a href="view_teachers.php" class="card-body text-center text-white text-decoration-none">
+                            <i class="fas fa-chalkboard-teacher fs-1 d-block mb-3"></i>
+                            <h6>View Teachers</h6>
+                        </a>
                     </div>
-                    <div class="col-4 col-md-3 col-xl-2">
-                        <div class="card h-100 dashboard-card card-2">
-                            <a href="review_profile_updates.php"
-                                class="card-body text-center text-white text-decoration-none">
-                                <i class="fas fa-user-edit fs-1 d-block mb-3"></i>
-                                <h6>Review Profile Updates</h6>
-                            </a>
-                        </div>
+                </div>
+                <div class="col-4 col-md-3 col-xl-2">
+                    <div class="card h-100 dashboard-card card-2">
+                        <a href="review_profile_updates.php"
+                            class="card-body text-center text-white text-decoration-none">
+                            <i class="fas fa-user-edit fs-1 d-block mb-3"></i>
+                            <h6>Review Profile Updates</h6>
+                        </a>
                     </div>
+                </div>
                 <?php endif; ?>
             </div>
         </div>
