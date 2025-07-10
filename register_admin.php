@@ -3,6 +3,11 @@ session_start();
 include 'db.php';
 include 'functions.php';
 
+if (isset($_ENV['ALLOW_REGISTER']) && $_ENV['ALLOW_REGISTER'] === 'false') {
+    echo '<h3>Registration is currently disabled on live hosted website. Sorry for the inconvenience.</h3>';
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $teacherID = $_POST['teacherID'];
     $first_name = $_POST['first_name'];
@@ -113,7 +118,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 </select>
                             </div>
                             <div class="d-grid">
+                                <?php if (isset($_ENV['ALLOW_REGISTER']) && $_ENV['ALLOW_REGISTER'] === 'false') : ?>
+                                <button type="submit" class="btn btn-primary" disabled>Register</button>
+                                <?php elseif (isset($_ENV['ALLOW_REGISTER']) && $_ENV['ALLOW_REGISTER'] === 'true') : ?>
                                 <button type="submit" class="btn btn-primary">Register</button>
+                                <?php endif; ?>
                             </div>
                         </form>
                     </div>

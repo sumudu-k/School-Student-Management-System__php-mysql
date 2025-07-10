@@ -51,7 +51,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <body class="d-flex flex-column min-vh-100">
     <main class="container-lg " style="flex: 1;">
-        <div class="row justify-content-center">
+        <div class="mt-3 container alert alert-warning  ">
+            <h5>Demo Account Credentials </h5>
+            <p>Email: sahan.abeykoon69@example.com</p>
+            <p>Password: student123</p>
+        </div>
+
+        <div class="row justify-content-center mb-4">
             <div class="col-md-6 col-sm-12">
                 <div class="mt-5 card shadow mt-4">
                     <div class="card-header bg-primary text-white">
@@ -76,8 +82,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             </div>
                         </form>
                     </div>
-                    <div class="card-footer text-center">
+                    <div class="card-footer text-center ">
                         <p class="mb-0">Don't have an account? <a href="register.php">Register here</a></p>
+                        <div class="alert alert-danger mt-3 text-center">
+                            You cannot create new accounts in Live hosted website.
+                            Please
+                            setup your own local environment to access full features. Visit
+                            [https://github.com/sumudu-k/School-Student-Management-System__php-mysql.git] for more
+                            details."
+                        </div>
                     </div>
                 </div>
             </div>

@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $query = "SELECT * FROM teachers WHERE email = ?";
+    $query = "SELECT * FROM teachers WHERE email = ? and is_approved = 1";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -49,6 +49,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <body class="d-flex flex-column min-vh-100">
     <main class="container-lg" style="flex: 1;">
+        <div class="mt-3 container alert alert-warning  ">
+            <h5>Demo Admin Account Credentials </h5>
+            <p>Email: nethmi.p07@example.com</p>
+            <p>Password: teacher123</p>
+        </div>
         <div class="container mt-5">
             <div class="row justify-content-center">
                 <div class="col-md-6">
