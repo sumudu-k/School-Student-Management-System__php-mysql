@@ -4,6 +4,16 @@ A web-based application for managing student, and teachers activities in a schoo
 
 ---
 
+## <span style="color: #007ACC; font-weight: bold;">🌐 Live Website</span>
+
+<a href="https://sms.sumudu.site">
+  <img src="https://img.shields.io/badge/Visit-Live%20Website-%23ee0000?style=for-the-badge&logo=globe&logoColor=white" style="height:40px; background-color:blue;" />
+</a>
+<br>
+🔗 Website: https://sms.sumudu.site
+
+---
+
 ## 🚀 Features
 
 ### 👨‍🎓 Student Dashboard
@@ -92,7 +102,19 @@ A web-based application for managing student, and teachers activities in a schoo
 
 - **Development Environment**
   - XAMPP (Apache server, MySQL, PHP)
+ 
+---
+## 🖥️ Deployed Server Specifications
 
+The Student Management System is deployed on the following server configuration:
+
+- ✅ **Server Provider**: DigitalOcean
+- 🌐 **Data Center Location**: BLR1 (Bangalore, India)
+- 🧠 **Memory (RAM)**: 2 GB
+- 💾 **Disk Space**: 50 GB SSD
+- 🖥️ **Operating System**: Ubuntu 24.04 LTS (x64)
+
+---
  ## 🤝 <span style="color: #007ACC; font-weight: bold;">Contributing</span>
 
 We welcome contributions to improve BlogMe! To contribute:
