@@ -74,6 +74,17 @@ A web-based application for managing student, and teachers activities in a schoo
 - **Password Hashing**: Secure password storage using bcrypt.
 
 ---
+## 🖥️ Deployed Server Specifications
+
+The Student Management System is deployed on the following server configuration:
+
+- ✅ **Server Provider**: DigitalOcean
+- 🌐 **Data Center Location**: BLR1 (Bangalore, India)
+- 🧠 **Memory (RAM)**: 2 GB
+- 💾 **Disk Space**: 50 GB SSD
+- 🖥️ **Operating System**: Ubuntu 24.04 LTS (x64)
+
+---
 
 ## 🏁 Getting Started
 
@@ -102,17 +113,7 @@ A web-based application for managing student, and teachers activities in a schoo
 
 - **Development Environment**
   - XAMPP (Apache server, MySQL, PHP)
- 
----
-## 🖥️ Deployed Server Specifications
 
-The Student Management System is deployed on the following server configuration:
-
-- ✅ **Server Provider**: DigitalOcean
-- 🌐 **Data Center Location**: BLR1 (Bangalore, India)
-- 🧠 **Memory (RAM)**: 2 GB
-- 💾 **Disk Space**: 50 GB SSD
-- 🖥️ **Operating System**: Ubuntu 24.04 LTS (x64)
 
 ---
  ## 🤝 <span style="color: #007ACC; font-weight: bold;">Contributing</span>
