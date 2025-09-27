@@ -130,15 +130,11 @@ We welcome contributions to improve BlogMe! To contribute:
 ## 🟡<span style="color: #007ACC; font-weight: bold;">Screenshots</span>
 
 <p float="left">
-  <img src="https://raw.githubusercontent.com/sumudu-k/School-Student-Management-System__php-mysql/refs/heads/main/screenshots/super%20admin%20dashboard.png" width="48%" />
-  <img src="https://raw.githubusercontent.com/sumudu-k/School-Student-Management-System__php-mysql/refs/heads/main/screenshots/manage%20assignments.png" width="48%" />
+  <img src="https://raw.githubusercontent.com/sumudu-k/School-Student-Management-System__php-mysql/refs/heads/main/screenshots/sms-cover1.png" width="48%" />
+  <img src="https://raw.githubusercontent.com/sumudu-k/School-Student-Management-System__php-mysql/refs/heads/main/screenshots/sms-cover2.png" width="48%" />
 </p>
 <p float="left">
-  <img src="https://raw.githubusercontent.com/sumudu-k/School-Student-Management-System__php-mysql/refs/heads/main/screenshots/review%20teacher%20registration.png" width="48%" />
-  <img src="https://raw.githubusercontent.com/sumudu-k/School-Student-Management-System__php-mysql/refs/heads/main/screenshots/student%20dashboard-1.png" width="48%" />
+  <img src="https://raw.githubusercontent.com/sumudu-k/School-Student-Management-System__php-mysql/refs/heads/main/screenshots/sms-cover3.png" width="48%" />
+  <img src="https://raw.githubusercontent.com/sumudu-k/School-Student-Management-System__php-mysql/refs/heads/main/screenshots/sms-cover4.png" width="48%" />
 </p>
-<p float="left">
-  <img src="https://raw.githubusercontent.com/sumudu-k/School-Student-Management-System__php-mysql/refs/heads/main/screenshots/student%20dashboard-2.png" width="48%" />
-</p>
-Thank you for using BlogMe! If you have any questions or feedback, feel free to contact me.
 
