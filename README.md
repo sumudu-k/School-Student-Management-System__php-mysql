@@ -10,7 +10,8 @@ A web-based application for managing student, and teachers activities in a schoo
   <img src="https://img.shields.io/badge/Visit-Live%20Website-%23ee0000?style=for-the-badge&logo=globe&logoColor=white" style="height:40px; background-color:blue;" />
 </a>
 <br>
-🔗 Website: https://sms.sumudu.site
+
+## 🔗 Website: https://sms.sumudu.site
 
 ---
 
